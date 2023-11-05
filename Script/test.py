@@ -160,6 +160,8 @@ for Tag in Tags:
     url = f'https://twitter.com/hashtag/{Tag}?src=hashtag_click&f=live'
     driver.get(url)
     if flag:
+        time.sleep(5)
+        driver.refresh
         Login(email,passwd,UserID)
         flag = 0
 

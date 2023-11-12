@@ -176,10 +176,7 @@ def maindesk(Tag,tweet_count):
             print(f"{Tag}, 집계된 트윗 수: {TW_Count}",)
             return
 
-
-#경로에 맞게 지정
 Key_path = './key.json'
-Key_path = 'C:/Users/goomi/OneDrive/바탕 화면/작업/Desk/X-BestJPG-Collection/Script/key.json'
 with open(Key_path, 'r', encoding="UTF-8") as KeyFile:
     KeyData = json.load(KeyFile)
 

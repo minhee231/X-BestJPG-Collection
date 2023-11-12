@@ -3,11 +3,16 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
+import boto3
 import json
 import time
 import re 
 
 global driver
+global s3
+global bucket_name
+global dir_path
 
 def urlSet(url):
     url_parts = url.split('&')
@@ -28,9 +33,9 @@ def setAria(aria_data):
         aria_attribute = aria_data.get_attribute("aria-label")
         pattern = r'(\d+)\s+(\w+)'
         matches = re.findall(pattern, aria_attribute)
-
         return matches # (키, 벨류)
-    except: return
+    except: 
+        return
 
 def setImg(imgs):
     count = 0
@@ -56,47 +61,80 @@ def scrollPage():
 
 def inputEmail(email):
     global driver
-
     driver.implicitly_wait(6000)
 
     input_element = driver.find_element(By.CLASS_NAME, 'r-30o5oe')
     input_element.send_keys(email)
     input_element.send_keys(Keys.RETURN)
 
-def inputPasswd(passwd):
+def inputPassword(password):
     global driver
-
     driver.implicitly_wait(6000)
+
+    input_element = driver.find_element(By.CLASS_NAME, 'r-homxoj')
+    input_element.send_keys(password)
+    input_element.send_keys(Keys.RETURN)
+
     
-    
-#예외처리 하세요
-#1. 아이디 안물어보고 바로 passwd 넘어갈 때.
-def Login(email,passwd,UserID):
+def inputUserID(UserID):
+    global driver
+    driver.implicitly_wait(6000)
+
+    input_element = driver.find_element(By.CLASS_NAME, 'r-30o5oe')
+    input_element.send_keys(UserID)
+    input_element.send_keys(Keys.RETURN)
+
+def Login(email,password,UserID):
     global driver
 
-    inputEmail(email)
-
-    #로그인 (비번 부분)
-    input_element = driver.find_element(By.CLASS_NAME, 'r-30o5oe')
-    try:
-        input_element.send_keys(UserID)
-        input_element.send_keys(Keys.RETURN)
-        time.sleep(1)
+    try:                                                                                                             
+        inputEmail(email)
 
         input_element = driver.find_element(By.CLASS_NAME, 'r-homxoj')
-        input_element.send_keys(passwd)
-        input_element.send_keys(Keys.RETURN)
+        element_type = input_element.get_attribute("type")
 
+        if 'text' in element_type:
+            inputUserID(UserID)
+        
+        inputPassword(password)
     except:
         print("Login Error")
 
+def Logout():
+    global driver
+    driver.implicitly_wait(6000)
+
+    element = driver.find_element(By.XPATH, '//*[@aria-label="Account menu"]')
+    element.send_keys(Keys.ENTER)
+
+    element = driver.find_element(By.XPATH, '//*[@data-testid="AccountSwitcher_Logout_Button"]')
+    element.send_keys(Keys.ENTER)
+
+    element = driver.find_element(By.XPATH, '//*[@data-testid="confirmationSheetConfirm"]')
+    element.send_keys(Keys.ENTER)
+
+def CreateJsonFile(FileName,FileData):
+    TweetDataJSON = json.dumps(FileData)
+
+    with open(f"./{FileName}", 'w') as file:
+        file.write(TweetDataJSON)
+
+def UploadJson(FileName):
+    global s3
+    global bucket_name
+    global dir_path
+
+    s3.put_object(Body=open(f"./{FileName}", 'rb'), Bucket=bucket_name, Key=f"{dir_path}/{FileName}", ACL='public-read')
+
 def maindesk(Tag,tweet_count):
     global driver
+    global s3
     TW_Count = 0
+    NewTweet = 0
     tweet_dupSet = set()
     TweetData = {}
-
     driver.implicitly_wait(6000)
+    jsonfile = f"{Tag}.json"
     while True:
         #트윗 검색
         tweets = driver.find_elements(By.XPATH, '//*[@data-testid="tweet"]')
@@ -124,49 +162,63 @@ def maindesk(Tag,tweet_count):
 
                         #json에 imgs 추가
                         TweetData[tweet_number]["imgs"] = img_datas.get("imgs")
-                        
                         TW_Count += 1 #AD false
-                        
+                        NewTweet = 0
+                        CreateJsonFile(jsonfile,TweetData)
         scrollPage()
-        if TW_Count > tweet_count: break
+        if NewTweet > 20:
+            UploadJson(jsonfile)
+            print("API 요청 수 초과")
+            print(f"{Tag}, 집계된 트윗 수: {TW_Count}",)
+            return
+        if TW_Count > tweet_count:
+            UploadJson(jsonfile)
+            print(f"{Tag}, 집계된 트윗 수: {TW_Count}",)
+            return
 
-    JsonFileName = f"./{Tag}.json"
-    with open(JsonFileName, "w") as json_file:
-        json.dump(TweetData, json_file)
 
 #경로에 맞게 지정
 Key_path = './key.json'
+Key_path = 'C:/Users/goomi/OneDrive/바탕 화면/작업/Desk/X-BestJPG-Collection/Script/key.json'
 with open(Key_path, 'r', encoding="UTF-8") as KeyFile:
     KeyData = json.load(KeyFile)
 
-Tags = KeyData["tags"]
-email = KeyData["email"]
-passwd = KeyData["passwd"]
-UserID = KeyData["UserID"]
-tweet_count = KeyData["tweet_count"]
-KeyFile.close
+Tags = KeyData["Twitter"]["tags"]
+emails = KeyData["Twitter"]["Accounts"]["Emails"]
+passwords = KeyData["Twitter"]["Accounts"]["Passwords"]
+UserIDs = KeyData["Twitter"]["Accounts"]["UserIDs"]
+SamePasswd = KeyData["Twitter"]["Accounts"]["PasswordSame"]
+tweet_count = KeyData["Twitter"]["tweet_count"]
+aws_access_key_id = KeyData["AWS"]["aws_access_key_id"]
+aws_secret_access_key = KeyData["AWS"]["aws_secret_access_key"]
+region_name = KeyData["AWS"]["region_name"]
+bucket_name = KeyData["AWS"]["bucket_name"]
+dir_path = KeyData["AWS"]["bucket_dir_name"]
 
+s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=region_name)
 #드라이버 셋팅
 chrome_options = Options()
 #chrome_options.add_experimental_option("detach", True)
 #chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
-#chrome_options.add_argument('window-size=1920x1080')
+#chrome_options.add_argument('window-size=1920x1080') 
 #driver = webdriver.Chrome(options=chrome_options)
 #driver = webdriver.Chrome(chrome_driver_path,options=chrome_options)
 driver = webdriver.Chrome()
 
-flag = 1
+
+NextCount = 0
 for Tag in Tags:
-    url = f'https://twitter.com/hashtag/{Tag}?src=hashtag_click&f=live'
+    driver.implicitly_wait(6000)
+    driver.refresh()
+    url = f'https://twitter.com/i/flow/login?redirect_after_login=%2Fhashtag%2F{Tag}%3Fsrc%3Dhashtag_click%26f%3Dlive'
     driver.get(url)
-    if flag:
-        time.sleep(5)
-        driver.refresh
-        Login(email,passwd,UserID)
-        flag = 0
+
+    if SamePasswd:
+        Login(emails[NextCount],passwords[0],UserIDs[NextCount])
+
+    else:
+        Login(emails[NextCount],passwords[NextCount],UserIDs[NextCount])
+    NextCount += 1
 
     maindesk(Tag,tweet_count)
-
-
-
-    
+    Logout()

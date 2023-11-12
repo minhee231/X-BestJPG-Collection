@@ -1,7 +1,39 @@
 {
-    "tags": ["mygo","星乃一歌"],
-    "email": "YourTwitterEmail",
-    "passwd": "YourTwitterPassWord",
-    "UserID": "YourTwitterUserID",
-    "tweet_count" : 100
+    "AWS":
+    {
+        "aws_access_key_id": "Your_Access_Key",
+        "aws_secret_access_key": "Your_Secret_Key",
+        "region_name": "Your_Region",
+        "bucket_name": "Your_Bucket_Name",
+        "bucket_dir_name": "Your_Bucket_Directory"
+    },
+
+    "Twitter":
+    {
+        "tags": ["Tag0","Tag1","Tag2"],
+        "tweet_count" : 1000,
+        
+        "Accounts": {
+            "Emails": [
+                "YourTwitterEmail_0",
+                "YourTwitterEmail_1",
+                "YourTwitterEmail_2"
+            ],
+
+            "Passwords":[
+                "YourTwitterPassWord"
+            ],
+            
+            "UserIDs": [
+                "YourTwitterUserID_0",
+                "YourTwitterUserID_1",
+                "YourTwitterUserID_2"
+            ],
+            
+            "//": "비번이 전부 같음? 전부 같으면 1입력, 그리고 Passwords의 값은 하나만 넣어주세요",
+            "PasswordSame": 1
+        }
+
+    }
+
 }

@@ -166,6 +166,7 @@ def maindesk(Tag,tweet_count):
                         NewTweet = 0
                         CreateJsonFile(jsonfile,TweetData)
         scrollPage()
+        NewTweet += 1
         if NewTweet > 20:
             UploadJson(jsonfile)
             print("API 요청 수 초과")

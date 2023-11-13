@@ -142,10 +142,13 @@ def maindesk(Tag,tweet_count):
         for tweet in tweets:
             if tweet not in tweet_dupSet:
                 tweet_dupSet.add(tweet)
-                Img_elements = tweet.find_elements(By.TAG_NAME, 'img')
-                Aria_element = tweet.find_element(By.CSS_SELECTOR, '.css-1dbjc4n.r-1kbdv8c.r-18u37iz.r-1wtj0ep.r-1s2bzr4.r-1ye8kvj')
-                Profile_info = tweet.find_element(By.CSS_SELECTOR, ".css-1dbjc4n.r-k4xj1c.r-18u37iz.r-1wtj0ep")
-                pro = Profile_info.find_element(By.CSS_SELECTOR, ".css-1dbjc4n.r-1awozwy.r-18u37iz.r-1cmwbt1.r-1wtj0ep")
+                try:
+                    Img_elements = tweet.find_elements(By.TAG_NAME, 'img')
+                    Aria_element = tweet.find_element(By.CSS_SELECTOR, '.css-1dbjc4n.r-1kbdv8c.r-18u37iz.r-1wtj0ep.r-1s2bzr4.r-1ye8kvj')
+                    Profile_info = tweet.find_element(By.CSS_SELECTOR, ".css-1dbjc4n.r-k4xj1c.r-18u37iz.r-1wtj0ep")
+                    pro = Profile_info.find_element(By.CSS_SELECTOR, ".css-1dbjc4n.r-1awozwy.r-18u37iz.r-1cmwbt1.r-1wtj0ep")
+                except:
+                    print("element find error")
 
                 if pro.text != 'Ad':
                     aria_datas = setAria(Aria_element)

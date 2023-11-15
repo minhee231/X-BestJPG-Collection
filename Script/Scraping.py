@@ -186,7 +186,6 @@ def maindesk(Tag,tweet_count):
             return
 
 Key_path = './key.json'
-Key_path = 'C:/Users/goomi/OneDrive/바탕 화면/작업/Desk/X-BestJPG-Collection/Script/key.json'
 with open(Key_path, 'r', encoding="UTF-8") as KeyFile:
     KeyData = json.load(KeyFile)
 

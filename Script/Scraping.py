@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import NoSuchElementException
 import boto3
 import json
 import time
@@ -105,12 +104,16 @@ def Logout():
     driver.implicitly_wait(6000)
 
     element = driver.find_element(By.XPATH, '//*[@aria-label="Account menu"]')
+    time.sleep(0.5)
     element.send_keys(Keys.ENTER)
 
     element = driver.find_element(By.XPATH, '//*[@data-testid="AccountSwitcher_Logout_Button"]')
-    element.send_keys(Keys.ENTER)
+    driver.implicitly_wait(6000)
+    element.click()
 
     element = driver.find_element(By.XPATH, '//*[@data-testid="confirmationSheetConfirm"]')
+    driver.implicitly_wait(6000)
+    time.sleep(0.5)
     element.send_keys(Keys.ENTER)
 
 def CreateJsonFile(FileName,FileData):
@@ -150,24 +153,26 @@ def maindesk(Tag,tweet_count):
                 except:
                     print("element find error")
 
-                if pro.text != 'Ad':
-                    aria_datas = setAria(Aria_element)
-                    img_datas = setImg(Img_elements)
+                try:
+                    if pro.text != 'Ad':
+                        aria_datas = setAria(Aria_element)
+                        img_datas = setImg(Img_elements)
 
-                    if aria_datas and img_datas:
-                        tweet_number = "Tweet" + str(TW_Count)
-                        TweetData[tweet_number] = {}
-                        
-                        #json에 aria data 추가
-                        for aria_data in aria_datas:
-                            value, key = aria_data
-                            TweetData[tweet_number][key.lower()] = int(value)
+                        if aria_datas and img_datas:
+                            tweet_number = "Tweet" + str(TW_Count)
+                            TweetData[tweet_number] = {}
+                            
+                            #json에 aria data 추가
+                            for aria_data in aria_datas:
+                                value, key = aria_data
+                                TweetData[tweet_number][key.lower()] = int(value)
 
-                        #json에 imgs 추가
-                        TweetData[tweet_number]["imgs"] = img_datas.get("imgs")
-                        TW_Count += 1 #AD false
-                        NewTweet = 0
-                        CreateJsonFile(jsonfile,TweetData)
+                            #json에 imgs 추가
+                            TweetData[tweet_number]["imgs"] = img_datas.get("imgs")
+                            TW_Count += 1 #AD false
+                            NewTweet = 0
+                            CreateJsonFile(jsonfile,TweetData)
+                except: print("save data error")
         scrollPage()
         NewTweet += 1
         if NewTweet > 20:
@@ -181,6 +186,7 @@ def maindesk(Tag,tweet_count):
             return
 
 Key_path = './key.json'
+Key_path = 'C:/Users/goomi/OneDrive/바탕 화면/작업/Desk/X-BestJPG-Collection/Script/key.json'
 with open(Key_path, 'r', encoding="UTF-8") as KeyFile:
     KeyData = json.load(KeyFile)
 
@@ -213,6 +219,7 @@ for Tag in Tags:
     driver.refresh()
     url = f'https://twitter.com/i/flow/login?redirect_after_login=%2Fhashtag%2F{Tag}%3Fsrc%3Dhashtag_click%26f%3Dlive'
     driver.get(url)
+    driver.refresh()
 
     if SamePasswd:
         Login(emails[NextCount],passwords[0],UserIDs[NextCount])

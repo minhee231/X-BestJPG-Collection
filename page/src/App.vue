@@ -1,27 +1,27 @@
 <template>
   <v-app>
     <v-main>
-      <HelloWorld></HelloWorld>
-      <cons />
-      <MainContent />
+      <Header></Header>
+      <Side/>
+      <RouterView/>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import Cons from './components/cons.vue'
-import MainContent from './components/MainContent.vue'
+import { RouterView } from 'vue-router';
+import Header from './components/Header.vue'
+import Side from './components/SideBar.vue'
 
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
-    Cons,
-    MainContent                                          
-  },
+    Header,
+    Side,
+    RouterView,
+},
 
   data: () => ({
     //

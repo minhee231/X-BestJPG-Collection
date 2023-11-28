@@ -30,7 +30,7 @@
   const HeaderLink = [
     'Tweets',
     'Profile'
-  ]
+  ];
 </script>
 
 <script>

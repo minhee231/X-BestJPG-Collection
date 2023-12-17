@@ -1,69 +1,61 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
 import boto3
 import json
 import time
-import re 
+import re
 
 global driver
 global s3
-global bucket_name
-global dir_path
 
-def urlSet(url):
-    url_parts = url.split('&')
+def setImageUrl(image_src):
+    if 'media' in image_src:
+        url_parts = image_src.split('&')
 
-    for i, part in enumerate(url_parts):
-        if part.startswith('name='):
-            url_parts[i] = 'name=large'
-    return '&'.join(url_parts)
+        for i, part in enumerate(url_parts):
+            if part.startswith('name='):
+                url_parts[i] = 'name=large'
+        return '&'.join(url_parts)
     
-def setImgUrl(imgsrc):
-    if 'media' in imgsrc:
-        return urlSet(imgsrc)
     else: return
 
-#aria-label의 키&벨류 
-def setAria(aria_data):
+def setImageJson(image_elements):
+    count = 0
+    flag = False
+    image_data = {"imgs" : {}}
+    
+    for image_element in image_elements:
+        image_src = setImageUrl(image_element.get_attribute('src'))
+        if image_src:
+            image_data['imgs']["img"+str(count)] = image_src
+            count += 1
+            flag = True
+        
+    if flag: return image_data
+
+def setAria(aria_element):
     try:
-        aria_attribute = aria_data.get_attribute("aria-label")
+        aria_attribute = aria_element.get_attribute("aria-label")
         pattern = r'(\d+)\s+(\w+)'
         matches = re.findall(pattern, aria_attribute)
         return matches # (키, 벨류)
-    except: 
-        return
-
-def setImg(imgs):
-    count = 0
-    flag = 0
-    img_data = {"imgs" : {}}
-    try:
-        for img in imgs:
-            Img_src = setImgUrl(img.get_attribute('src'))
-            if Img_src:
-                flag = 1
-                img_data["imgs"]["img" + str(count)] = setImgUrl(Img_src)
-                count += 1
-            
-        if flag: return img_data
     except: return
-
+    
 def scrollPage():
     global driver
+
     time.sleep(0.2)
     driver.implicitly_wait(6000)
     body = driver.find_element(By.TAG_NAME, 'body')
     body.send_keys(Keys.PAGE_DOWN)
 
-def inputEmail(email):
+def inputUserID(user_id):
     global driver
     driver.implicitly_wait(6000)
 
     input_element = driver.find_element(By.CLASS_NAME, 'r-30o5oe')
-    input_element.send_keys(email)
+    input_element.send_keys(user_id)
     input_element.send_keys(Keys.RETURN)
 
 def inputPassword(password):
@@ -74,158 +66,119 @@ def inputPassword(password):
     input_element.send_keys(password)
     input_element.send_keys(Keys.RETURN)
 
-    
-def inputUserID(UserID):
-    global driver
-    driver.implicitly_wait(6000)
-
-    input_element = driver.find_element(By.CLASS_NAME, 'r-30o5oe')
-    input_element.send_keys(UserID)
-    input_element.send_keys(Keys.RETURN)
-
-def Login(email,password,UserID):
+def login(user_id,password):
     global driver
 
-    try:                                                                                                             
-        inputEmail(email)
+    try: 
+        inputUserID(user_id)
+        driver.implicitly_wait(6000)
+        time.sleep(1)
 
-        input_element = driver.find_element(By.CLASS_NAME, 'r-homxoj')
-        element_type = input_element.get_attribute("type")
-
-        if 'text' in element_type:
-            inputUserID(UserID)
-        
         inputPassword(password)
+        
     except:
         print("Login Error")
 
-def Logout():
-    global driver
-    driver.implicitly_wait(6000)
+def createJsonFile(file_name,file_data):
+    tweet_data_json = json.dumps(file_data)
 
-    element = driver.find_element(By.XPATH, '//*[@aria-label="Account menu"]')
-    time.sleep(0.5)
-    element.send_keys(Keys.ENTER)
+    with open(f"./{file_name}", 'w') as file:
+        file.write(tweet_data_json)
 
-    element = driver.find_element(By.XPATH, '//*[@data-testid="AccountSwitcher_Logout_Button"]')
-    driver.implicitly_wait(6000)
-    element.click()
-
-    element = driver.find_element(By.XPATH, '//*[@data-testid="confirmationSheetConfirm"]')
-    driver.implicitly_wait(6000)
-    time.sleep(0.5)
-    element.send_keys(Keys.ENTER)
-
-def CreateJsonFile(FileName,FileData):
-    TweetDataJSON = json.dumps(FileData)
-
-    with open(f"./{FileName}", 'w') as file:
-        file.write(TweetDataJSON)
-
-def UploadJson(FileName):
+def uploadJson(file_name):
     global s3
     global bucket_name
     global dir_path
 
-    s3.put_object(Body=open(f"./{FileName}", 'rb'), Bucket=bucket_name, Key=f"{dir_path}/{FileName}", ACL='public-read')
+    s3.put_object(Body=open(f"./{file_name}", 'rb'), Bucket=bucket_name, Key=f"{dir_path}/{file_name}", ACL='public-read')
 
-def maindesk(Tag,tweet_count):
+def findTweet(tag,search_limit):
     global driver
     global s3
-    TW_Count = 0
-    NewTweet = 0
-    tweet_dupSet = set()
-    TweetData = {}
+    tweet_count = 0
+    new_tweet = 0
+    tweet_set = set()
+    tweet_data = {}
     driver.implicitly_wait(6000)
-    jsonfile = f"{Tag}.json"
+    json_file_name = f"{tag}.json"
+
     while True:
-        #트윗 검색
         tweets = driver.find_elements(By.XPATH, '//*[@data-testid="tweet"]')
-
         for tweet in tweets:
-            if tweet not in tweet_dupSet:
-                tweet_dupSet.add(tweet)
+            if tweet not in tweet_set: #중복제거
+                tweet_set.add(tweet)
                 try:
-                    Img_elements = tweet.find_elements(By.TAG_NAME, 'img')
-                    Aria_element = tweet.find_element(By.CSS_SELECTOR, '.css-1dbjc4n.r-1kbdv8c.r-18u37iz.r-1wtj0ep.r-1s2bzr4.r-1ye8kvj')
-                    Profile_info = tweet.find_element(By.CSS_SELECTOR, ".css-1dbjc4n.r-k4xj1c.r-18u37iz.r-1wtj0ep")
-                    pro = Profile_info.find_element(By.CSS_SELECTOR, ".css-1dbjc4n.r-1awozwy.r-18u37iz.r-1cmwbt1.r-1wtj0ep")
+                    image_elements = tweet.find_elements(By.TAG_NAME, 'img')
+                    aria_element = tweet.find_element(By.XPATH,'//*[@class="css-175oi2r r-1kbdv8c r-18u37iz r-1wtj0ep r-1ye8kvj r-1s2bzr4"]')
+                    profile_information = tweet.find_element(By.XPATH,'//*[@class="css-175oi2r r-k4xj1c r-18u37iz r-1wtj0ep"]')
+                    ad_element = profile_information.find_element(By.XPATH,'//*[@class="css-1qaijid r-bcqeeo r-qvutc0 r-poiln3"]')                    
                 except:
-                    print("element find error")
+                    print("element found error")
 
                 try:
-                    if pro.text != 'Ad':
-                        aria_datas = setAria(Aria_element)
-                        img_datas = setImg(Img_elements)
+                    if ad_element.text != 'Ad':
+                        imgage_datas = setImageJson(image_elements)
+                        aria_datas = setAria(aria_element)
 
-                        if aria_datas and img_datas:
-                            tweet_number = "Tweet" + str(TW_Count)
-                            TweetData[tweet_number] = {}
+                        if aria_datas and imgage_datas:
+                            tweet_number = "Tweet" + str(tweet_count)
+                            tweet_data[tweet_number] = {}
                             
                             #json에 aria data 추가
                             for aria_data in aria_datas:
                                 value, key = aria_data
-                                TweetData[tweet_number][key.lower()] = int(value)
+                                tweet_data[tweet_number][key.lower()] = int(value)
 
                             #json에 imgs 추가
-                            TweetData[tweet_number]["imgs"] = img_datas.get("imgs")
-                            TW_Count += 1 #AD false
-                            NewTweet = 0
-                            CreateJsonFile(jsonfile,TweetData)
+                            tweet_data[tweet_number]["imgs"] = imgage_datas.get("imgs")                          
+                            tweet_count += 1
+                            new_tweet = 0
+                            createJsonFile(json_file_name,tweet_data)
                 except: print("save data error")
         scrollPage()
-        NewTweet += 1
-        if NewTweet > 20:
-            UploadJson(jsonfile)
+
+        new_tweet += 1
+        if new_tweet > 20:
+            uploadJson(json_file_name)
             print("API 요청 수 초과")
-            print(f"{Tag}, 집계된 트윗 수: {TW_Count}",)
+            print(f"{tag}, 집계된 트윗 수: {tweet_count}",)
             return
-        if TW_Count > tweet_count:
-            UploadJson(jsonfile)
-            print(f"{Tag}, 집계된 트윗 수: {TW_Count}",)
+        if tweet_count > search_limit:
+            uploadJson(json_file_name)
+            print(f"{tag}, 집계된 트윗 수: {tweet_count}",)
             return
 
-Key_path = './key.json'
-with open(Key_path, 'r', encoding="UTF-8") as KeyFile:
-    KeyData = json.load(KeyFile)
+#함수 ========================================================
+        
+key_path = './key.json'
+key_path = 'C:/Users/goomi/Downloads/key.json'
+with open(key_path, 'r', encoding="UTF-8") as keyFile:
+    key_data = json.load(keyFile)
 
-Tags = KeyData["Twitter"]["tags"]
-emails = KeyData["Twitter"]["Accounts"]["Emails"]
-passwords = KeyData["Twitter"]["Accounts"]["Passwords"]
-UserIDs = KeyData["Twitter"]["Accounts"]["UserIDs"]
-SamePasswd = KeyData["Twitter"]["Accounts"]["PasswordSame"]
-tweet_count = KeyData["Twitter"]["tweet_count"]
-aws_access_key_id = KeyData["AWS"]["aws_access_key_id"]
-aws_secret_access_key = KeyData["AWS"]["aws_secret_access_key"]
-region_name = KeyData["AWS"]["region_name"]
-bucket_name = KeyData["AWS"]["bucket_name"]
-dir_path = KeyData["AWS"]["bucket_dir_name"]
+tags = key_data["TWITTER"]["tags"]
+password = key_data["TWITTER"]["password"]
+user_id = key_data["TWITTER"]["user_id"]
+search_limit = key_data["TWITTER"]["search_limit"]
+
+aws_access_key_id = key_data["AWS"]["aws_access_key_id"]
+aws_secret_access_key = key_data["AWS"]["aws_secret_access_key"]
+region_name = key_data["AWS"]["region_name"]
+bucket_name = key_data["AWS"]["bucket_name"]
+dir_path = key_data["AWS"]["bucket_dir_name"]
 
 s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=region_name)
-#드라이버 셋팅
-chrome_options = Options()
-#chrome_options.add_experimental_option("detach", True)
-#chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
-#chrome_options.add_argument('window-size=1920x1080') 
-#driver = webdriver.Chrome(options=chrome_options)
-#driver = webdriver.Chrome(chrome_driver_path,options=chrome_options)
 driver = webdriver.Chrome()
 
-
-NextCount = 0
-for Tag in Tags:
-    driver.implicitly_wait(6000)
-    driver.refresh()
-    url = f'https://twitter.com/i/flow/login?redirect_after_login=%2Fhashtag%2F{Tag}%3Fsrc%3Dhashtag_click%26f%3Dlive'
+count = 0
+for tag in tags:
+    url = f'https://twitter.com/i/flow/login?redirect_after_login=%2Fhashtag%2F{tag}%3Fsrc%3Dhashtag_click%26f%3Dlive'
     driver.get(url)
-    driver.refresh()
+    driver.implicitly_wait(6000)
+    login(user_id[count],password)
+    findTweet(tag,search_limit)
+    count += 1
+    #드라이버 초기화
+    driver.delete_all_cookies()
 
-    if SamePasswd:
-        Login(emails[NextCount],passwords[0],UserIDs[NextCount])
 
-    else:
-        Login(emails[NextCount],passwords[NextCount],UserIDs[NextCount])
-    NextCount += 1
-
-    maindesk(Tag,tweet_count)
-    Logout()
+    

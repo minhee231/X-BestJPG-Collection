@@ -98,9 +98,10 @@ def findTweet(tag,search_limit):
     tweet_count = 0
     new_tweet = 0
     tweet_set = set()
+    aria_set = set()
     tweet_data = {}
-    driver.implicitly_wait(6000)
     json_file_name = f"{tag}.json"
+    driver.implicitly_wait(6000)
 
     while True:
         tweets = driver.find_elements(By.XPATH, '//*[@data-testid="tweet"]')
@@ -124,16 +125,19 @@ def findTweet(tag,search_limit):
                             tweet_number = "Tweet" + str(tweet_count)
                             tweet_data[tweet_number] = {}
                             
-                            #json에 aria data 추가
-                            for aria_data in aria_datas:
-                                value, key = aria_data
-                                tweet_data[tweet_number][key.lower()] = int(value)
+                            aria_tuple = tuple(sorted(aria_datas))
+                            if aria_tuple not in aria_set:
+                                aria_set.add(aria_tuple)
+                                for aria_data in aria_datas:
+                                    value, key = aria_data
+                                    tweet_data[tweet_number][key.lower()] = int(value)
 
                             #json에 imgs 추가
-                            tweet_data[tweet_number]["imgs"] = imgage_datas.get("imgs")                          
-                            tweet_count += 1
-                            new_tweet = 0
-                            createJsonFile(json_file_name,tweet_data)
+                                tweet_data[tweet_number]["imgs"] = imgage_datas.get("imgs")                          
+                                tweet_count += 1
+                                new_tweet = 0
+                                createJsonFile(json_file_name,tweet_data)
+
                 except: print("save data error")
         scrollPage()
 
@@ -147,6 +151,73 @@ def findTweet(tag,search_limit):
             uploadJson(json_file_name)
             print(f"{tag}, 집계된 트윗 수: {tweet_count}",)
             return
+        
+def changeTweetNumber(start_number,best_json):
+    chang_json = {}
+
+    try:
+        with open(f'./{best_json}', 'r', encoding="UTF-8") as keyFile:
+            tweet_json = json.load(keyFile)
+
+        for tweet_info in tweet_json.values():
+            chang_json[f'Tweet{start_number}'] = tweet_info
+            
+        return chang_json
+    except: return {}
+        
+def splitBestTweet(json_file):
+    tweet_100_count = 0
+    tweet_300_count = 0
+    tweet_500_count = 0
+    tweet_1000_count = 0
+    best_100 = {}
+    best_300 = {}
+    best_500 = {}
+    best_1000 = {}
+    likes = 0
+
+    with open(f'./{json_file}', 'r', encoding="UTF-8") as keyFile:
+        tweet_json = json.load(keyFile)
+
+    for tweet_info in tweet_json.values():
+        if 'likes' in tweet_info:
+            likes = tweet_info["likes"]
+            
+            if likes >= 100:
+                best_100[f'Tweet{tweet_100_count}'] = tweet_info
+                tweet_100_count += 1
+
+            if likes >= 300:
+                best_300[f'Tweet{tweet_300_count}'] = tweet_info
+                tweet_300_count += 1
+
+            if likes >= 500:
+                best_500[f'Tweet{tweet_500_count}'] = tweet_info
+                tweet_500_count += 1
+
+            if likes >= 1000:
+                best_1000[f'Tweet{tweet_1000_count}'] = tweet_info
+                tweet_1000_count += 1
+
+    best_100.update(changeTweetNumber(tweet_100_count, f'best100_{json_file}'))        
+    best_300.update(changeTweetNumber(tweet_300_count, f'best300_{json_file}'))
+    best_500.update(changeTweetNumber(tweet_500_count, f'best500_{json_file}'))
+    best_1000.update(changeTweetNumber(tweet_1000_count, f'best1000_{json_file}'))
+
+    with open(f'./best100_{json_file}', 'w') as file:
+            file.write(json.dumps(best_100))
+
+    with open(f'./best300_{json_file}', 'w') as file:
+        file.write(json.dumps(best_300))
+    
+    with open(f'./best500_{json_file}', 'w') as file:
+        file.write(json.dumps(best_500))
+    
+    with open(f'./best1000_{json_file}', 'w') as file:
+        file.write(json.dumps(best_1000))
+        
+
+
 
 #함수 ========================================================
         
@@ -179,6 +250,4 @@ for tag in tags:
     count += 1
     #드라이버 초기화
     driver.delete_all_cookies()
-
-
-    
+    splitBestTweet(f'{tag}.json')

@@ -222,7 +222,6 @@ def splitBestTweet(json_file):
 #함수 ========================================================
         
 key_path = './key.json'
-key_path = 'C:/Users/goomi/Downloads/key.json'
 with open(key_path, 'r', encoding="UTF-8") as keyFile:
     key_data = json.load(keyFile)
 

@@ -5,7 +5,8 @@
         "aws_secret_access_key": "Your_Secret_Key",
         "region_name": "Your_Region",
         "bucket_name": "Your_Bucket_Name",
-        "bucket_dir_name": "Your_Bucket_Directory"
+        "latest_dir_path": "latest_path",
+        "best_dir_path": "best_path"
     },
 
     "TWITTER":
@@ -24,8 +25,5 @@
         ],
 
         "password": "YourTwitterPassWord"
-
-
     }
-
 }

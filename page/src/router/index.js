@@ -5,55 +5,44 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/views/introduction.vue'),
+    component: () => import('@/views/Introduction.vue'),
   },
   {
     path: '/introduction',
     name: 'introduction',
-    component: () => import('@/views/introduction.vue'),
+    component: () => import('@/views/Introduction.vue'),
   },
   {
     path: '/project-sekai',
     name: 'prsk',
-    component: () => import('@/views/project_sekai.vue'),
+    component: () => import('@/views/ProjectSekai.vue'),
     children: [
       {
         path: 'best/:likes',
         name: 'sekai-best',
-        component: () => import('@/views/project_sekai.vue'),
+        component: () => import('@/views/ProjectSekai.vue'),
         props: true
       },
-      {
-        path: 'latest',
-        name: 'sekai-latest',
-        component: () => import('@/views/project_sekai.vue'),
-        props: true
-      }
+      
     ]
   },
   {
     path: '/mygo',
     name: 'mygo',
-    component: () => import('@/views/mygo'),
+    component: () => import('@/views/Mygo.vue'),
     children: [
       {
         path: 'best/:likes',
         name: 'mygo-best',
-        component: () => import('@/views/mygo.vue'),
+        component: () => import('@/views/Mygo.vue'),
         props: true
       },
-      {
-        path: 'latest',
-        name: 'mygo-latest',
-        component: () => import('@/views/mygo.vue'),
-        props: true
-      }
     ]
   },
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('@/views/profile.vue'),
+    component: () => import('@/views/Profile.vue'),
   },
 ];
 

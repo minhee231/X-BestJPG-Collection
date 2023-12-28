@@ -8,8 +8,6 @@
       rail
     >
       <div>
-        <v-btn variant="text" :style="{ width:'150px', height: '60px'}">latest</v-btn>
-        <v-divider class="my-2"></v-divider> <!--선-->
         <v-btn class="bg-grey-darken-3" variant="text" :style="{ width:'150px', height: '60px'}">likes</v-btn>
         
         <v-btn

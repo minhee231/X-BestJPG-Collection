@@ -10,13 +10,6 @@
         </v-img>
         
         </v-avatar>
-
-        <!-- <v-btn
-          v-for="Header in HeaderLink"
-          :key="Header"
-          :text="Header"
-          variant="text"
-        ></v-btn> -->
         <v-btn
           v-for=" info in HeaderLink"
           :key="info['name']"
@@ -36,16 +29,9 @@ import { useRouter } from 'vue-router';
 import profile_image from '../assets/profile.png'
 
 const router = useRouter();
-  // const HeaderLink = [
-  //   'project sekai',
-  //   'Mygo',
-  //   'Introduction',
-  //   'Profile'
-  // ];
-
 const HeaderLink = [
-  {"name": 'Projcet Sekai', "path": "/project-sekai/latest"},
-  {"name": 'mygo', "path": "/mygo/latest"},
+  {"name": 'Projcet Sekai', "path": "/project-sekai/best/100"},
+  {"name": 'mygo', "path": "/mygo/best/100"},
   {"name": 'introduction', "path": "/introduction"},
   {"name": 'profile', "path": "/profile"}
 ];

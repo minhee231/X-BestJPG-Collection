@@ -2,15 +2,15 @@
     <v-app>
       <v-main>
         <SideBar/>
-        <MainContent :SomeJson="json_data"></MainContent>
+        <MainContent :json_data="json_data"></MainContent>
       </v-main>
     </v-app>
   </template>
 
 
 <script>
-import SideBar from '../components/TweetSideBar.vue'
-import MainContent from '../components/MainContent.vue';
+import SideBar from '@/components/TweetSideBar.vue'
+import MainContent from '@/components/MainContent.vue';
 import axios from 'axios';
 
 export default {
@@ -21,7 +21,7 @@ export default {
 
   }),
   mounted() {
-    this.fetchData('mygo');
+    this.fetchData('prsk_fa');
   },
 
   methods: {

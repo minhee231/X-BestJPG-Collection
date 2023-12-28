@@ -6,18 +6,23 @@
         color="grey-darken-1"
         size="32"
         >
-        <v-img
-          :src="'https://imgur.com/CRoTFLD.png'"
-        >
+        <v-img :src="profile_image">
         </v-img>
         
         </v-avatar>
 
-        <v-btn
+        <!-- <v-btn
           v-for="Header in HeaderLink"
           :key="Header"
           :text="Header"
           variant="text"
+        ></v-btn> -->
+        <v-btn
+          v-for=" info in HeaderLink"
+          :key="info['name']"
+          :text="info['name']"
+          variant="text"
+          @click="navigatorTo(info.path)"
         ></v-btn>
         <v-spacer></v-spacer>
 
@@ -27,22 +32,35 @@
 </template>
 
 <script setup>
-  const HeaderLink = [
-    'Tweets',
-    'Profile'
-  ];
+import { useRouter } from 'vue-router';
+import profile_image from '../assets/profile.png'
+
+const router = useRouter();
+  // const HeaderLink = [
+  //   'project sekai',
+  //   'Mygo',
+  //   'Introduction',
+  //   'Profile'
+  // ];
+
+const HeaderLink = [
+  {"name": 'Projcet Sekai', "path": "/project-sekai/latest"},
+  {"name": 'mygo', "path": "/mygo/latest"},
+  {"name": 'introduction', "path": "/introduction"},
+  {"name": 'profile', "path": "/profile"}
+];
+
+const navigatorTo = (path) => {
+  router.push(path);
+};
+
 </script>
 
 <script>
   export default {
-    name: 'ConstrainedHeader',
+    name: 'MainHeader',
     data: () => ({
-      links: [
-        'Dashboard',
-        'Messages',
-        'Profile',
-        'Updates',
-      ],
+  
     }),
   }
 </script>

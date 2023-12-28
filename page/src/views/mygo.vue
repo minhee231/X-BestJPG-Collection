@@ -1,31 +1,27 @@
 <template>
     <v-app>
       <v-main>
-        <MainContent :UserPromptTag="Sekai" :UserPromptName="Sekai_btn"></MainContent>
+        <SideBar/>
+        <MainContent :UserPromptTag="LeoNeed"></MainContent>
       </v-main>
     </v-app>
   </template>
 
 
 <script>
+import SideBar from '../components/TweetSideBar.vue'
 import MainContent from '../components/MainContent.vue';
 
 export default {
-  name: 'SekaiComponent',
+  name: 'MygoComponent',
   
   data: () => ({
-    Sekai_btn: [
-      "prsk"
-    ],
 
-    Sekai: [
-      "prsk_fa"
-    ]
-    
   }),
 
   components: {
     MainContent,
+    SideBar
   },
 };
 </script>

@@ -13,31 +13,17 @@ const routes = [
     component: () => import('@/views/Introduction.vue'),
   },
   {
-    path: '/project-sekai',
+    path: '/project-sekai/:likes',
     name: 'prsk',
     component: () => import('@/views/ProjectSekai.vue'),
-    children: [
-      {
-        path: 'best/:likes',
-        name: 'sekai-best',
-        component: () => import('@/views/ProjectSekai.vue'),
-        props: true
-      },
+    props: true
       
-    ]
   },
   {
-    path: '/mygo',
+    path: '/mygo/:likes',
     name: 'mygo',
     component: () => import('@/views/Mygo.vue'),
-    children: [
-      {
-        path: 'best/:likes',
-        name: 'mygo-best',
-        component: () => import('@/views/Mygo.vue'),
-        props: true
-      },
-    ]
+    props: true
   },
   {
     path: '/profile',

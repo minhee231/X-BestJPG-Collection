@@ -20,14 +20,19 @@ export default {
     json_data: {}
 
   }),
+  props: {
+    likes: Array
+  },
+
   mounted() {
-    this.fetchData('prsk_fa');
+    this.fetchData('prsk_fa',this.likes);
+  
   },
 
   methods: {
-    async fetchData(tag) {
+    async fetchData(tag,likes) {
       try {
-        const response = await axios.get(`https://null4uproject.s3.ap-northeast-2.amazonaws.com/public/${tag}.json`);
+        const response = await axios.get(`https://null4uproject.s3.ap-northeast-2.amazonaws.com/public/best/best${likes}_${tag}.json`);
         const Data = response.data;
         console.log(Data);
         this.json_data = { ...this.json_data, ...Data };
@@ -44,5 +49,6 @@ export default {
     MainContent,
     SideBar
   },
+
 };
 </script>

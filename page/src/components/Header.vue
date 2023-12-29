@@ -26,7 +26,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import profile_image from '../assets/profile.png'
+import profile_image from '@/assets/profile.png'
 
 const router = useRouter();
 const HeaderLink = [

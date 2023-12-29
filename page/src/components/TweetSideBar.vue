@@ -16,6 +16,7 @@
           :text="like"
           variant="text"
           :style="{ width:'150px', height: '60px'}"
+          @click="changePath(like)"
         ></v-btn>
         <v-divider class="my-2"></v-divider> <!--선-->
       </div>
@@ -38,8 +39,21 @@ const likes_button = [
   <script>
   export default {
     name: 'TweetSide',
-  };
+
+    data: () => ({
+  
+  }),
+
+  methods: {
+    changePath(likes) {
+      const current_path = this.$route.path;
+      const newPath = current_path.replace(/\/(\d+)$/, `/${likes}`);
+      this.$router.push({ path: newPath, params: { likes: likes } });
+    }
+  }
+};
   </script>
+
 <style scoped>
 .fixed {
   position: fixed;

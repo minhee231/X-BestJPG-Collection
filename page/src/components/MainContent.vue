@@ -33,7 +33,7 @@ export default {
   },
 
   props: {
-    json_data: Array
+    json_data: Array 
   },
 
 };

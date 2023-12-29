@@ -20,14 +20,24 @@ data: () => ({
   json_data: {}
 
 }),
-mounted() {
-  this.fetchData('prsk_fa');
+props: {
+  likes: Array
 },
 
+mounted() {
+  this.fetchData('mygo',this.likes);
+},
+
+watch: {
+  likes: function(newLikes) {
+    this.fetchData('mygo', newLikes);
+    },
+  },
+
 methods: {
-  async fetchData(tag) {
+  async fetchData(tag,likes) {
     try {
-      const response = await axios.get(`https://null4uproject.s3.ap-northeast-2.amazonaws.com/public/${tag}.json`);
+      const response = await axios.get(`https://null4uproject.s3.ap-northeast-2.amazonaws.com/public/best/best${likes}_${tag}.json`);
       const Data = response.data;
       console.log(Data);
       this.json_data = { ...this.json_data, ...Data };
@@ -44,5 +54,6 @@ components: {
   MainContent,
   SideBar
 },
+
 };
 </script>

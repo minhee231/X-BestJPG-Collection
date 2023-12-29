@@ -26,7 +26,12 @@ export default {
 
   mounted() {
     this.fetchData('prsk_fa',this.likes);
-  
+  },
+
+  watch: {
+  likes: function(newLikes) {
+    this.fetchData('prsk_fa', newLikes);
+    },
   },
 
   methods: {

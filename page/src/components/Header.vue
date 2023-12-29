@@ -30,8 +30,8 @@ import profile_image from '@/assets/profile.png'
 
 const router = useRouter();
 const HeaderLink = [
-  {"name": 'Projcet Sekai', "path": "/project-sekai/best/100"},
-  {"name": 'mygo', "path": "/mygo/best/100"},
+  {"name": 'Projcet Sekai', "path": "/project-sekai/100"},
+  {"name": 'mygo', "path": "/mygo/100"},
   {"name": 'introduction', "path": "/introduction"},
   {"name": 'profile', "path": "/profile"}
 ];

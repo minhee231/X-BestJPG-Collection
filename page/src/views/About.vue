@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer  class="bg-grey-darken-2" v-model="drawer">
+    <v-navigation-drawer  class="bg-grey-darken-2" >
       <v-sheet
         color="grey-darken-4"
         class="pa-4"
@@ -11,10 +11,12 @@
           id="avatar"
           @mouseover="handleMouseOver"
           @mouseleave="handleMouseLeave"
-          @click="goEgg"
+          @click="showDialog"
         >
         <v-img :src="profile_image"></v-img></v-avatar>
-
+        <v-dialog v-model="dialog" max-width="1300">
+        <v-img :src="tomori" width="100%" height="100%" object-fit="contain" style="border: 3px solid black;"></v-img>
+        </v-dialog>
         <div>Minhee</div>
       </v-sheet>
       
@@ -60,29 +62,24 @@
 
 <script setup>
 import profile_image from '@/assets/profile.png'
-
-import { useRouter } from 'vue-router';
-const router = useRouter();
-
-function goEgg()
-{
-  router.push("/Egg")
-}
+import tomori from '@/assets/tomori.png'
 
 const  links = [
   {'icon': 'mdi-github', 'text': 'Github', 'link': 'https://github.com/minhee231/X-BestJPG-Collection'},
   {'icon': 'mdi-post', 'text': 'Tistory', 'link': 'https://minhee-goo.tistory.com/'},
-  
 ]
+
 </script>
 
 <script>
   export default {
     name: 'IntorductionCompo',
-    data: () => ({
-      cards: ['Today', 'Yesterday'],
-      drawer: null,
-    }),
+    data() {
+    return {
+      profile_image: 'URL_TO_YOUR_IMAGE',
+      dialog: false,
+    };
+  },
 
     methods: {
       goLink(link)
@@ -94,6 +91,9 @@ const  links = [
       },
       handleMouseLeave() {
         document.getElementById('avatar').style.opacity = '1';
+      },
+      showDialog() {
+      this.dialog = true;
       },
     },
   }

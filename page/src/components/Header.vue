@@ -32,8 +32,7 @@ const router = useRouter();
 const HeaderLink = [
   {"name": 'Projcet Sekai', "path": "/project-sekai/100"},
   {"name": 'mygo', "path": "/mygo/100"},
-  {"name": 'introduction', "path": "/introduction"},
-  {"name": 'profile', "path": "/profile"}
+  {"name": 'about', "path": "/about"},
 ];
 
 const navigatorTo = (path) => {

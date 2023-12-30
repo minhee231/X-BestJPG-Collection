@@ -1,30 +1,40 @@
 <template>
     <v-app>
-      <v-main>
-        <MainContent :UserPromptTag="LeoNeed"></MainContent>
-      </v-main>
+      <v-main class="bg-grey-darken-2">
+    <v-row>
+      <v-col cols="2">
+      </v-col>
+      
+      
+      <v-col>
+        <v-sheet class="bg-grey-darken-3" min-height="1000" rounded="lg">
+          <v-sheet class="bg-grey-darken-3" min-height="20" style="display: flex;"></v-sheet>
+
+        </v-sheet>
+      </v-col>
+
+      <v-col cols="3">
+      </v-col>
+      <v-col cols="1">
+      </v-col>
+    </v-row>
+  </v-main>
     </v-app>
   </template>
 
 
 <script>
-import MainContent from '../components/MainContent.vue';
 
 export default {
-  name: 'LeoNeedComponent',
+  name: 'ProfileComponent',
   
   data: () => ({
-    LeoNeed: {
-      "ichika": "星乃一歌",
-      "saki": "天馬咲希",
-      "honami": "望月穂波",
-      "shiho": "日野森志歩"
-    }
+    
 
   }),
 
   components: {
-    MainContent,
+
   },
 };
 </script>

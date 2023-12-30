@@ -5,12 +5,12 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/views/Introduction.vue'),
+    component: () => import('@/views/About.vue'),
   },
   {
-    path: '/introduction',
-    name: 'introduction',
-    component: () => import('@/views/Introduction.vue'),
+    path: '/about',
+    name: 'About',
+    component: () => import('@/views/About.vue'),
   },
   {
     path: '/project-sekai/:likes',

@@ -5,16 +5,16 @@
 # Deploy 
 * AWS EC2
 * Apache Server
+[배포 과정](https://minhee-goo.tistory.com/15)
 
 # Link
-[GoSite]()
+http://15.164.158.177/about
 
-### 번외
-[GoS3Site](https://goooooo.s3.ap-northeast-2.amazonaws.com/index.html)  
-S3 웹 정적 배포가 가능해 한 번 올려보았습니다.  
-route를 통한 페이지 접근은 가능하지만 이동한 URL에 다시 접근하면 액세스 디나이드가 뜹니다.
+# ETC
+EC2 요금 때문에 서버를 내릴지도 모릅니다.  
+  
 
-### 예
-https://goooooo.s3.ap-northeast-2.amazonaws.com/index.html 에 접근하여 아무 버튼이나 눌러
-https://goooooo.s3.ap-northeast-2.amazonaws.com/project-sekai/100 에 접근하는것은 가능합니다.
-하지만 https://goooooo.s3.ap-northeast-2.amazonaws.com/project-sekai/100 이 URL에 다시 요청을 보내면 액세스 디나이드가 뜹니다.
+[S3-Link](https://goooooo.s3.ap-northeast-2.amazonaws.com/index.html)  
+그래서 S3 배포하였습니다. 하지만 S3를 통한 배포는 문제점이 있습니다.
+
+[문제점](https://minhee-goo.tistory.com/16)

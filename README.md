@@ -4,7 +4,7 @@
 
 # Deploy 
 * AWS EC2
-* Apache Server
+* Apache Server  
 [배포 과정](https://minhee-goo.tistory.com/15)
 
 # Link

@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from datetime import datetime
 import boto3
 import json
 import time
@@ -52,9 +53,6 @@ def scrollDownPage():
 
     time.sleep(0.3)
     driver.implicitly_wait(6000)
-    # current_scroll_position = driver.execute_script("return window.scrollY;")
-    # new_scroll_position = current_scroll_position + 300
-    # driver.execute_script(f"window.scrollTo(0, {new_scroll_position});")
     
     body = driver.find_element(By.TAG_NAME, 'body')
     body.send_keys(Keys.PAGE_DOWN)
@@ -100,11 +98,20 @@ def createJsonFile(file_name,file_data):
     with open(f"./{file_name}", 'w') as file:
         file.write(tweet_data_json)
 
-def uploadJson(file_name,dir_path):
+def uploadFile(file_name,dir_path):
     global s3tr
     global bucket_name
 
     s3.put_object(Body=open(f"./{file_name}", 'rb'), Bucket=bucket_name, Key=f"{dir_path}/{file_name}", ACL='public-read')
+
+def saveNowTime():
+    filename = "NowTime.txt"
+    _time = f'{datetime.now():20%y년%m월%d일 %H시%M분}'
+
+    with open(f"./{filename}", 'w', encoding='utf-8') as file:
+        file.write(_time)
+
+    uploadFile(filename,'public')
 
 def findTweet(tag,search_limit,dir_path):
     global driver
@@ -163,13 +170,13 @@ def findTweet(tag,search_limit,dir_path):
                                                                                                                                                                                                                                                                                                                                                                                                                             
         new_tweet += 1
         if new_tweet > 30:
-            uploadJson(json_file_name, dir_path)
+            uploadFile(json_file_name, dir_path)
             print("API 요청 수 초과")
             print(f"{tag}, 집계된 트윗 수: {tweet_count}",)
             return
         
         if tweet_count > search_limit:
-            uploadJson(json_file_name, dir_path)
+            uploadFile(json_file_name, dir_path)
             print(f"{tag}, 집계된 트윗 수: {tweet_count}",)
             return
         
@@ -192,12 +199,10 @@ def removeDuplicates(existing_json,new_data):
             existing_datas = json.load(keyFile) #best json
     except:
         existing_datas = dict()
-    if new_data not in existing_datas.values():
+    if new_data not in existing_datas.values(): #중복된 트윗은 새로운 aria-label값을 저장하도록 수정
         return True
         
     else: return
-
-
         
 def splitBestTweet(json_file, dir_path):
     likes = 0
@@ -227,12 +232,13 @@ def splitBestTweet(json_file, dir_path):
         with open(f'./{tweet_count["filename"]}', 'w') as file:
             file.write(json.dumps(tweet_count['data']))
 
-        uploadJson(tweet_count['filename'], dir_path)
+        uploadFile(tweet_count['filename'], dir_path)
 
 
 #함수 ========================================================
         
 key_path = './key.json'
+
 with open(key_path, 'r', encoding="UTF-8") as keyFile:
     key_data = json.load(keyFile)
 
@@ -262,3 +268,5 @@ for tag in tags:
     #드라이버 초기화
     driver.delete_all_cookies()
     splitBestTweet(f'{tag}.json', best_dir_path)
+
+saveNowTime()

@@ -4,21 +4,14 @@
 
 # Deploy 
 * AWS EC2
-* Apache Server  
-[배포 과정](https://minhee-goo.tistory.com/15)
+* AWS ALB
+* AWS Route53
+* Apache Server
 
 # Link
-http://15.164.158.177/about
+https://www.x-coll.com/
 
 # ETC
-EC2 요금 때문에 서버를 내릴지도 모릅니다.  
-  
-
-[S3-Link](https://goooooo.s3.ap-northeast-2.amazonaws.com/index.html)  
-그래서 S3 배포하였습니다. 하지만 S3를 통한 배포는 문제점이 있습니다.  
-  
-페이지에서 버튼을 눌러 페이지에 접근하면 vue router를 통해 /project-sekai/100 으로 이동합니다.  
-하지만 S3에는 /project-sekai/100에 해당하는 파일이 없어 액세스 디나이드를 반환합니다.  
-때문에 위 웹사이트에 접근하기 위해서는  
-https://goooooo.s3.ap-northeast-2.amazonaws.com/index.html
-존재하는 파일인 index.html에 접근해야 합니다.
+지갑사정으로 인해 서버를 닫을 수 있습니다.
+현재 코드서버 가동X (트윗 갱신 안됨)
+[개발일지](https://minhee-goo.tistory.com/category/X-Best%20%EA%B0%9C%EB%B0%9C%EC%9D%BC%EC%A7%80)
